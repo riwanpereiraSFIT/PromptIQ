@@ -1,0 +1,27 @@
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+*.env
+.env
+
+# Node & Frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.tmp/
+dist/
+.npm/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# TensorFlow / Keras temporary checkpoints (keep trained model in backend/models)
+*.checkpoint
+*.log
