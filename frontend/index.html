@@ -2,6 +2,17 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
+    <meta name="theme-color" content="#020617" />
+    <script>
+      // Set the saved theme before styles render to prevent a light/dark flash.
+      try {
+        if (localStorage.getItem('promptiq_theme') === 'light') {
+          document.documentElement.classList.replace('dark', 'light');
+          document.documentElement.style.colorScheme = 'light';
+          document.querySelector('meta[name="theme-color"]').content = '#f8fafc';
+        }
+      } catch (_) { /* A disabled storage API should not block rendering. */ }
+    </script>
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PromptIQ — Deep Learning-Based Prompt Quality Assessment and Improvement System</title>

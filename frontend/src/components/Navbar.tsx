@@ -42,7 +42,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, health 
   };
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md border-b transition-colors duration-200 bg-slate-950/80 border-slate-800 text-slate-100 dark:bg-slate-950/85 dark:border-slate-800/80 light:bg-white/85 light:border-slate-200 light:text-slate-800">
+    <header className="sticky top-0 z-50 backdrop-blur-md border-b transition-colors duration-200 bg-slate-950/80 border-slate-800 text-slate-100 dark:bg-slate-950/85 dark:border-slate-800/80 ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand Logo */}
         <div
@@ -56,7 +56,11 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, health 
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-indigo-200 to-cyan-300 dark:from-white dark:via-indigo-200 dark:to-cyan-300 bg-clip-text text-transparent">
+              <span className={`font-extrabold text-xl tracking-tight bg-gradient-to-r bg-clip-text text-transparent ${
+                theme === 'dark'
+                  ? 'from-white via-indigo-200 to-cyan-300'
+                  : 'from-slate-900 via-indigo-700 to-cyan-700'
+              }`}>
                 PromptIQ
               </span>
               <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20">
@@ -119,7 +123,9 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, health 
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            aria-label="Toggle dark/light theme"
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            aria-pressed={theme === 'light'}
             className="p-2 rounded-lg border border-slate-800 bg-slate-900/60 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
           >
             {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}

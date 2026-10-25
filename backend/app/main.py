@@ -2,7 +2,8 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.config import (
     ALLOWED_ORIGINS,
@@ -11,6 +12,7 @@ from app.config import (
     MODEL_PATH,
     OBSERVED_SCORE_MIN,
     OBSERVED_SCORE_MAX,
+    FRONTEND_DIST_DIR,
 )
 from app.model_service import get_model_service
 from app.feedback import (
@@ -77,6 +79,8 @@ app.add_middleware(
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc: Exception):
     """Ensure raw stack traces are never exposed to the frontend/user."""
+    if isinstance(exc, HTTPException):
+        return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
     logger.error(f"Unhandled error during request {request.url.path}: {exc}", exc_info=True)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -315,3 +319,51 @@ async def get_metrics():
             "the horizontal mean baseline."
         ),
     )
+
+
+# ---------------------------------------------------------------------------
+# Single-Port Production Serving & Client-Side SPA Routing
+# ---------------------------------------------------------------------------
+if (FRONTEND_DIST_DIR / "assets").is_dir():
+    app.mount(
+        "/assets",
+        StaticFiles(directory=str(FRONTEND_DIST_DIR / "assets")),
+        name="assets"
+    )
+
+
+@app.get("/")
+async def serve_root():
+    index_file = FRONTEND_DIST_DIR / "index.html"
+    if index_file.is_file():
+        return FileResponse(index_file)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={"message": "PromptIQ API operational. Build frontend with 'npm run build' to view the interface."}
+    )
+
+
+@app.get("/{full_path:path}")
+async def serve_spa(full_path: str):
+    # Ensure unmatched API routes return clean JSON 404
+    if full_path == "api" or full_path.startswith("api/"):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="API endpoint not found"
+        )
+
+    # Serve static assets from dist root (e.g. vite.svg, favicon.ico, etc.)
+    file_path = FRONTEND_DIST_DIR / full_path
+    if full_path and file_path.is_file():
+        return FileResponse(file_path)
+
+    # SPA routing fallback: return index.html for client-side pages
+    index_file = FRONTEND_DIST_DIR / "index.html"
+    if index_file.is_file():
+        return FileResponse(index_file)
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Frontend build artifact not found. Please run 'npm run build' inside frontend directory."
+    )
+

@@ -173,55 +173,52 @@ If you trained a new model in Google Colab exported to `/content/best_pels_bilst
 
 ---
 
-### Step 2: Start the FastAPI Backend Server
+### Option A: Unified Single-Port Mode (Recommended for Demos & Presentations)
 
-Open **Windows PowerShell** (or Command Prompt) in the project directory:
+In Single-Port mode, the entire application (React frontend + FastAPI backend + trained BiLSTM model) runs together on a single port (**`http://localhost:8000`**):
 
-```powershell
-# Set Python encoding to UTF-8 on Windows
-$env:PYTHONUTF8 = "1"
-$env:PYTHONPATH = "backend"
+1. **Build the React frontend** (if not already built):
+   ```powershell
+   cd frontend
+   npm run build
+   cd ..
+   ```
+2. **Start the Unified Server**:
+   ```powershell
+   $env:PYTHONUTF8 = "1"
+   $env:PYTHONPATH = "backend"
+   .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+   ```
+   *Or simply double-click **`start_production.bat`**.*
 
-# Run the FastAPI server using Uvicorn
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
-```
-
-*Or simply double-click **`start_backend.bat`**.*
-
-You will see:
-```text
-INFO:     Started server process
-INFO:     Successfully loaded BiLSTM Keras model for inference.
-INFO:     Application startup complete.
-INFO:     Uvicorn running on http://127.0.0.1:8000
-```
-
-Verify backend health in your browser:
-- Health Check: [http://127.0.0.1:8000/api/health](http://127.0.0.1:8000/api/health)
-- Interactive API Docs (Swagger): [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+3. Open **[http://localhost:8000](http://localhost:8000)** in your browser:
+   - Web Application UI: `http://localhost:8000/`
+   - Client-side routes (SPA fallback): `http://localhost:8000/evaluator`, `http://localhost:8000/improve`, `http://localhost:8000/analytics`, `http://localhost:8000/about`
+   - Interactive Swagger API docs: `http://localhost:8000/docs`
+   - Health check: `http://localhost:8000/api/health`
 
 ---
 
-### Step 3: Start the React Frontend
+### Option B: Dual-Terminal Development Mode (Vite Hot-Reload)
 
-Open a **second PowerShell window** in the project directory:
+For active frontend development with instant HMR:
 
-```powershell
-cd frontend
-npm run dev
-```
+1. **Start Backend (Terminal 1):**
+   ```powershell
+   $env:PYTHONUTF8 = "1"
+   $env:PYTHONPATH = "backend"
+   .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+   ```
+   *Or double-click `start_backend.bat`.*
 
-*Or simply double-click **`start_frontend.bat`**.*
+2. **Start Frontend (Terminal 2):**
+   ```powershell
+   cd frontend
+   npm run dev
+   ```
+   *Or double-click `start_frontend.bat`.*
 
-You will see:
-```text
-  VITE v5.4.10  ready in 320 ms
-
-  ➜  Local:   http://localhost:5173/
-  ➜  Network: use --host to expose
-```
-
-Open **[http://localhost:5173](http://localhost:5173)** in Google Chrome or your browser.
+3. Open **`http://localhost:5173`** in your browser. All `/api` calls are automatically proxied to port 8000.
 
 ---
 

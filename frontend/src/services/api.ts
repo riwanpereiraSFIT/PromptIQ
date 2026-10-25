@@ -54,7 +54,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     }
     // Network or server unreachable error
     throw new ApiError(
-      'Unable to connect to the PromptIQ backend server. Please verify the backend is running at http://127.0.0.1:8000.',
+      'Unable to connect to the PromptIQ backend API. Please verify the server is running.',
       0
     );
   }

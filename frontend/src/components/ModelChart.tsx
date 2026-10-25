@@ -10,6 +10,7 @@ import {
   Cell,
 } from 'recharts';
 import { ModelComparisonRecord } from '../types/api';
+import { useTheme } from '../context/ThemeContext';
 import { ArrowDownRight, ArrowUpRight, Award, BarChart3, Info } from 'lucide-react';
 
 interface ModelChartProps {
@@ -20,6 +21,8 @@ type MetricKey = 'mae' | 'mse' | 'rmse' | 'r2';
 
 export const ModelChart: React.FC<ModelChartProps> = ({ records }) => {
   const [activeMetric, setActiveMetric] = useState<MetricKey>('mae');
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
 
   const metricConfigs: Record<
     MetricKey,
@@ -122,16 +125,16 @@ export const ModelChart: React.FC<ModelChartProps> = ({ records }) => {
       <div className="h-72 w-full pt-4">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 10, right: 20, left: -10, bottom: 20 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+            <CartesianGrid strokeDasharray="3 3" stroke={isLight ? '#e2e8f0' : '#1e293b'} />
             <XAxis
               dataKey="name"
-              stroke="#64748b"
+              stroke={isLight ? '#475569' : '#64748b'}
               fontSize={12}
               tickLine={false}
               dy={8}
             />
             <YAxis
-              stroke="#64748b"
+              stroke={isLight ? '#475569' : '#64748b'}
               fontSize={12}
               tickLine={false}
               dx={-5}
@@ -169,7 +172,7 @@ export const ModelChart: React.FC<ModelChartProps> = ({ records }) => {
                   fill={
                     entry.isBiLSTM
                       ? '#8b5cf6' // Bright violet highlight for BiLSTM
-                      : '#334155' // Muted slate for others
+                      : (isLight ? '#94a3b8' : '#334155') // Contrasting bar for each theme
                   }
                 />
               ))}
